@@ -1,0 +1,30 @@
+Detail of Connetion function usage in main index.js:
+Explanation (step by step):
+
+ConnectDBfunction()
+
+This is your database connection function (usually uses mongoose.connect).
+
+Returns a Promise → so you can use .then() and .catch() for success/failure handling.
+
+.then(() => {...})-->Executes only if the DB connection is successful.
+
+Inside this block:
+
+app.listen(...) → Starts your Express server on the specified port.
+
+app.on("Error", ...) → Handles server-level errors (like port already in use).
+
+process.env.PORT || 3000
+
+Uses the port number from your .env file if available.
+
+If not set, defaults to 3000.
+
+.catch((error) => {...})
+
+Runs if the DB connection fails.
+
+Logs the error message.
+
+process.exit(1) → Stops the server because running without DB could break the app.
