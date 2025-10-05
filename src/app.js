@@ -22,7 +22,7 @@ app.use(cors(
 import UserRoutes from "./routes/UserRoutes.js";
 
 //declaration of route
-app.use("/users", UserRoutes, )// --> /user is route and when it hit,controller pass to UserRoute and in that file we will write get/post or other method
+app.use("/api/v1/users", UserRoutes)// --> /user is route and when it hit,controller pass to UserRoute and in that file we will write get/post or other method
 
 
 export {app};
