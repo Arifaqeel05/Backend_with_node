@@ -30,7 +30,7 @@ const userSchema=new Schema(
 
             fullName:
             {
-                type:Strin,
+                type:String,
                 trim:true,
                 index:true,
                 required:true

@@ -1,5 +1,5 @@
 import multer from 'multer';
-import multer from "multer";
+
 
 // Configure storage for uploaded files
 const storage = multer.diskStorage({
@@ -16,6 +16,4 @@ const storage = multer.diskStorage({
 });
 
 // Create an upload instance with the defined storage configuration
-const upload = multer({ storage: storage });
-
-export default upload;
+export const upload = multer({  storage });
