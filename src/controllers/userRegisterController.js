@@ -3,7 +3,32 @@ import {ApiError} from "../utils/Api_Error.js";
 import {User} from '../models/userModel.js';
 import {uploadCloudinary} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/Api_Response.js";
+import { use } from "react";
+//-----------------token generation method-----
+const generateAccessAndRefreshToken=async(userID)=>{
+         try {
+            //find user by ID which we receive in parameter
+            const user=await User.findById(userID);
 
+
+            //store reference of Access/refresh token that we have created in User model
+            const accessToken=user.generateAccessToken();
+            const refreshToken=user.generateRefreshToken();
+            
+
+            //store refreshToken in database
+            user.refreshToken=refreshToken;
+            await user.save({validateBeforeSave:false});
+ 
+            //return the both token:
+            return {refreshToken,accessToken}
+
+         } catch (error) {
+            throw new ApiError(501,"ERROR AT TOKEN GENERATION");
+            
+         }
+      }
+//------------REGISTER USER------------------------------
 
 const userRegister= asyncHandler(async (req,res)=>{
 
@@ -81,5 +106,78 @@ const userRegister= asyncHandler(async (req,res)=>{
    );
 
 });
+
+//---------------------------END HERE--------------------------
+
+
+//---------------------------LOGIN-------------------------------
+ 
+   const loginUser= asyncHandler(async(req, res)=>{
+
+      //taking data 
+      const {username, email, password}=req.body;
+
+      //check what user have send from the frontend, if user didn't provide email or username, throw erro
+      if(!username || !email){
+         throw new ApiError(400, "Username or email is required");
+      }
+
+      //if user has send email or username, the find in database
+      //User.findOne({username})      //finding the user on  the base of username/email.
+
+      //if we check both in one step, then skip previous "findone " and do below step:
+      const user=await User.findOne({
+         $or:[
+            {email},{username}
+         ]
+      })
+
+      if(!user){
+         throw new ApiError(404, "User not Exist");
+      }
+
+      //if we find the email/username of user, then now check password:
+      const passwordValidate=await user.isPasswordCorrect(password);
+
+      //throw error if password wrong
+      if(!passwordValidate){
+         throw new ApiError(401, "WRONG PASSWORD, TRY AGAIN");
+      }
+
+      //IF PASSWORD IS CORRECT, CREAT ACCESS/REFRESH TOKENS, we will create separate method onthe top , so we use it where we need
+
+      const {accessToken,refreshToken}=await generateAccessAndRefreshToken(user._id);
+
+      const loggedInUser=await User.findById(user._id).select(
+         "-password -refreshToken"
+      )
+
+      //design cookies options(simple object)
+
+      const options={
+         httpOnly:true,
+         secure:true
+      }
+
+      //now we have to return a response:
+      return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshtoken",refreshToken,options).json(
+         new Api_Response(
+            200,{
+               user:loggedInUser,accessToken,refreshToken
+
+
+            },
+            "USER LOGIN SUCESSFULLY !!!!"
+         )
+      )
+      
+
+
+
+   })
+
+
+
+//----------------------------LOGIN END HERE-----------------------
 
 export {userRegister};
