@@ -3,7 +3,6 @@ import {ApiError} from "../utils/Api_Error.js";
 import {User} from '../models/userModel.js';
 import {uploadCloudinary} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/Api_Response.js";
-import { use } from "react";
 //-----------------token generation method-----
 const generateAccessAndRefreshToken=async(userID)=>{
          try {
@@ -175,9 +174,14 @@ const userRegister= asyncHandler(async (req,res)=>{
 
 
    })
-
-
-
 //----------------------------LOGIN END HERE-----------------------
 
-export {userRegister};
+
+//-----------------------------LOG OUT START----------------------
+const logOutUser=asyncHandler(async(req,res)=>{
+   //clear all cookies
+   
+})
+//-----------------------------LOG OUT END------------------------
+
+export {userRegister,loginUser,logOutUser};
