@@ -117,7 +117,7 @@ const userRegister= asyncHandler(async (req,res)=>{
       const {username, email, password}=req.body;
 
       //check what user have send from the frontend, if user didn't provide email or username, throw erro
-      if(!username || !email){
+      if(!(username || email)){
          throw new ApiError(400, "Username or email is required");
       }
 
@@ -159,7 +159,10 @@ const userRegister= asyncHandler(async (req,res)=>{
       }
 
       //now we have to return a response:
-      return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshtoken",refreshToken,options).json(
+      return res.status(200).cookie(
+         "accessToken", accessToken, options)
+         .cookie("refreshtoken",refreshToken,options)
+         .json(
          new Api_Response(
             200,{
                user:loggedInUser,accessToken,refreshToken
@@ -180,7 +183,27 @@ const userRegister= asyncHandler(async (req,res)=>{
 //-----------------------------LOG OUT START----------------------
 const logOutUser=asyncHandler(async(req,res)=>{
    //clear all cookies
-   
+   //token -->undefind
+
+   //access user because we have created a middleware which will find a user for us who will be already login
+   User.findByIdAndUpdate(
+      await req.user._id,
+      {
+         //what we want to update
+         $set:{
+            refreshToken:undefined
+         }
+
+      }
+
+   )
+    const options={
+         httpOnly:true,
+         secure:true
+      }
+      return res.status(200).clearCookie("accessToken",options).clearCookie("refreshToken",options).json(
+         new ApiResponse(200,"user logout successfully")
+      )
 })
 //-----------------------------LOG OUT END------------------------
 

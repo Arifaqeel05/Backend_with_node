@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { userRegister } from "../controllers/userRegisterController.js";
+import { loginUser, logOutUser, userRegister } from "../controllers/userRegisterController.js";
 import {upload} from "../middlewares/MulterMiddleware.js";
+import {verifyJWT} from "../middlewares/authMiddleware.js";
 
 
 const router=Router();
@@ -19,6 +20,12 @@ router.route("/register").post(
 
         }
     ]),
-    userRegister) //
+    userRegister
+) //
+
+router.route("/login").post(loginUser);
+
+//secured routes
+router.route("/logout").post(verifyJWT,logOutUser) //here we inject middleware named "verifyJWT", just before logout meth
 
 export default router;
