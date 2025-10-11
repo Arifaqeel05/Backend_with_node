@@ -10,6 +10,7 @@ const generateAccessAndRefreshToken=async(userID)=>{
             const user=await User.findById(userID);
 
 
+
             //store reference of Access/refresh token that we have created in User model
             const accessToken=user.generateAccessToken();
             const refreshToken=user.generateRefreshToken();
@@ -23,9 +24,9 @@ const generateAccessAndRefreshToken=async(userID)=>{
             return {refreshToken,accessToken}
 
          } catch (error) {
-            throw new ApiError(501,"ERROR AT TOKEN GENERATION");
-            
-         }
+                     console.error(error);
+                     throw new ApiError(500, "Error while generating tokens");
+  }
       }
 //------------REGISTER USER------------------------------
 
